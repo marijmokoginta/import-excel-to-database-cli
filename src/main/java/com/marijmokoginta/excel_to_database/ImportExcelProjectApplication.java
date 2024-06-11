@@ -27,27 +27,40 @@ public class ImportExcelProjectApplication {
 			try {
 				conn = DatabaseConnection.getConnection(dbName);
 				if (conn == null)
-					System.err.println("Koneksi ke database gagal!");
+					System.err.println(ColorText.ANSI_RED + "Koneksi ke database gagal!" + ColorText.ANSI_RESET);
 				else {
 					System.out.println(ColorText.ANSI_GREEN + "Koneksi ke database berhasil!" + ColorText.ANSI_RESET);
 					break;
 				}
 			} catch (SQLException exception) {
-				System.err.println("Terjadi sql exception");
-				System.err.println(exception.getMessage());
+				System.err.println(ColorText.ANSI_RED + "Terjadi sql exception" + ColorText.ANSI_RESET);
+				System.err.println(ColorText.ANSI_RED + exception.getMessage() + ColorText.ANSI_RESET);
 			} finally {
 				if (conn != null) {
 					try {
 						conn.close();
 					} catch (SQLException exception2) {
-						System.err.println(exception2.getMessage());
+						System.err.println(ColorText.ANSI_RED + exception2.getMessage() + ColorText.ANSI_RESET);
 					}
 				}
 				
 			}
 		}
 
-		String tableName = input.getString("Enter database table name: ");
+		String tableName;
+		while (true) {
+			tableName = input.getString("Enter database table name: ");
+			try {
+				if (DatabaseConnection.isTableExist(dbName, tableName)) {
+					System.out.println(ColorText.ANSI_GREEN + "Tabel ditemukan!" + ColorText.ANSI_RESET);
+					break;
+				} else {
+					System.err.println(ColorText.ANSI_RED + "Tabel " + tableName + " tidak ditemukan!" + ColorText.ANSI_RESET);
+				}
+			} catch (SQLException exception) {
+				System.err.println(ColorText.ANSI_RED + exception.getMessage() + ColorText.ANSI_RESET);
+			}
+		}
 		String columnName = input.getString("Enter database column name: ");
 
 		String filePath;
@@ -57,7 +70,7 @@ public class ImportExcelProjectApplication {
 			if (file.exists() && file.isFile())
 				System.out.println(ColorText.ANSI_GREEN + "File ditemukan!" + ColorText.ANSI_RESET);
 			else
-				System.err.println("File not found!");
+				System.err.println(ColorText.ANSI_RED + "File not found!" + ColorText.ANSI_RESET);
 
 			try {
 				data = CSVReader.readFileCSV(filePath, true, ";");
@@ -67,7 +80,7 @@ public class ImportExcelProjectApplication {
 				} else
 					System.out.println(data.size() + "data!");
 			} catch (IOException exception) {
-				System.err.println(exception.getMessage());
+				System.err.println(ColorText.ANSI_RED + exception.getMessage() + ColorText.ANSI_RESET);
 			}
 		}
 
@@ -76,8 +89,9 @@ public class ImportExcelProjectApplication {
 			DatabaseSaver.saveToDatabase(data, dbName, tableName, columnName);
 			System.out.println(ColorText.ANSI_GREEN + "Berhasil menyimpan data ke database!" + ColorText.ANSI_RESET);
 		} catch (SQLException exception) {
-			System.err.println(exception.getMessage());
+			System.err.println(ColorText.ANSI_RED + exception.getMessage() + ColorText.ANSI_RESET);
 		}
+		System.exit(0);
 	}
 
 }
