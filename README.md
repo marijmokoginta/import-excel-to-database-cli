@@ -29,6 +29,6 @@ Langkah-langkah untuk menginstal proyek ini di mesin lokal Anda.
 ## Menjalankan Aplikasi
 
 Berikut adalah perintah untuk menjalankan aplikasi ini.
-    ```bash
+```bash
     mvn exec:java -Dexec.mainClass=com.marijmokoginta.excel_to_database.ImportExcelProjectApplication
-    ```
+```
